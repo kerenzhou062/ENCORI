@@ -197,7 +197,7 @@ def regionClassifier(mirnaSeq, alignment, targetSeq):
     regionDict['gap'] = gapTagList
     return regionDict
 
-def main(mirnaSeq, alignment, targetSeq):
+def CalculateTdmdScore(mirnaSeq, alignment, targetSeq):
     # calculate a score for TDMD
     ## mirnaSeq: 3'->5', alignment:3'->5', targetSeq:5'->3'
     ## like:UUGUUGUUUUAGUG-AU-CAGAAGGU,||||||||||||||    ||||||| ,AACAACAAAAUCACCAAUGUCUUCCA
@@ -258,31 +258,33 @@ def main(mirnaSeq, alignment, targetSeq):
     tdmdScore = round(score / mirnaLength, 4)
     return tdmdScore
 
+def main():
+    mirnaSeq =  'UUGUUGUUUUAGUG-AU-CAGAAGGU'
+    alignment = '||||||||||||||    ||||||| '
+    targetSeq = 'AACAACAAAAUCACCAAUGUCUUCCA'
+    print(CalculateTdmdScore(mirnaSeq, alignment, targetSeq))
 '''
 example for tdmdScore
 eg1: miR-7 and Cyrano
 mirnaSeq =  'UUGUUGUUUUAGUG-AU-CAGAAGGU'
 alignment = '||||||||||||||    ||||||| '
 targetSeq = 'AACAACAAAAUCACCAAUGUCUUCCA'
-main(mirnaSeq, alignment, targetSeq)
+CalculateTdmdScore(mirnaSeq, alignment, targetSeq)
 tdmd score: 3.4247
 
 eg2: miR-29b and NREP
 mirnaSeq =  'GUAACCGAU---GGAUGGUGCUA'
 alignment = ':  || |||   ::|||||||||'
 targetSeq = 'UUGUGACUAAAGUUUACcacgaU'
-main(mirnaSeq, alignment, targetSeq)
+CalculateTdmdScore(mirnaSeq, alignment, targetSeq)
 tdmd score: 1.2853
 
 eg3: ramdon pairing
 mirnaSeq =  'CCAGUGUUGGCAUG-AU-CAGAAGGU'
 alignment = '    ||||    ||    ||||||| '
 targetSeq = 'AACAACAAAAUCACCAAUGUCUUCCA'
-main(mirnaSeq, alignment, targetSeq)
+CalculateTdmdScore(mirnaSeq, alignment, targetSeq)
 tdmd score: 0.5762
 '''
 if __name__ == '__main__':
-    mirnaSeq =  'UUGUUGUUUUAGUG-AU-CAGAAGGU'
-    alignment = '||||||||||||||    ||||||| '
-    targetSeq = 'AACAACAAAAUCACCAAUGUCUUCCA'
-    print(main(mirnaSeq, alignment, targetSeq))
+    main()
