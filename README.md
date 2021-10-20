@@ -1,2 +1,2 @@
 # ENCORI
-Here are the codes that used to process data in ENCORI platform
+Here are the codes used to process data in ENCORI platform
