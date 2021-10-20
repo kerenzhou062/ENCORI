@@ -282,7 +282,7 @@ main(mirnaSeq, alignment, targetSeq)
 tdmd score: 0.5762
 '''
 if __name__ == '__main__':
-    mirnaSeq =  'CCAGUGUUGGCAUG-AU-CAGAAGGU'
-    alignment = '    ||||    ||    ||||||| '
+    mirnaSeq =  'UUGUUGUUUUAGUG-AU-CAGAAGGU'
+    alignment = '||||||||||||||    ||||||| '
     targetSeq = 'AACAACAAAAUCACCAAUGUCUUCCA'
-    main(mirnaSeq, alignment, targetSeq)
+    print(main(mirnaSeq, alignment, targetSeq))
