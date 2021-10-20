@@ -5,7 +5,7 @@ import re
 import math
 from collections import defaultdict
 
-def reconAlignment (mirnaSeq, alignment, targetSeq, watsonCrickDict, wobblePairDict):
+def ReconAlignment (mirnaSeq, alignment, targetSeq, watsonCrickDict, wobblePairDict):
     ## to make alignment completed, For example
     ##ugccugccgguucuaUACCUCa      *  *ugccugccgguucuaUACCUCa
     ##               ||||||       *->* :|    |::::   |||||| 
@@ -28,7 +28,7 @@ def reconAlignment (mirnaSeq, alignment, targetSeq, watsonCrickDict, wobblePairD
     reconAlign = ''.join(pairList)
     return reconAlign
 
-def creatWatsonCrickDict (watsonList, crickList):
+def CreatWatsonCrickDict (watsonList, crickList):
     if len(watsonList) != len(crickList):
         sys.stderr.write("watson and crick list should be in the same length")
         sys.exit()
@@ -42,7 +42,7 @@ def creatWatsonCrickDict (watsonList, crickList):
                 pairDict[clist[k]].update([wlist[j]])
     return pairDict
 
-def mirnaPosTag(mirnaSeq, pos):
+def MirnaPosTag(mirnaSeq, pos):
     mirnaSeqRev = mirnaSeq[::-1]
     indexFlag = 0
     count = 0
@@ -58,7 +58,7 @@ def mirnaPosTag(mirnaSeq, pos):
     return indexFlag
 
 
-def mirTargetSitesType(mirnaSeq, alignment, targetSeq):
+def MirTargetSitesType(mirnaSeq, alignment, targetSeq):
     ## ref. Metazoan MicroRNAs, Cell, 2018
     ###         3' UTR
     ### NNNNNN.. Offset 6mer
@@ -98,11 +98,11 @@ def mirTargetSitesType(mirnaSeq, alignment, targetSeq):
         ## for noncanonical sites
         ## only 1 mismatch in seed region is allowed
         ##1 Productive 3′-supplementary pairing typically centers on nucleotides 13–16
-        index13Flag = mirnaPosTag(mirnaSeq, 13)
+        index13Flag = MirnaPosTag(mirnaSeq, 13)
         prime3CenterMatch = alignRev[index13Flag:index13Flag + 4].count('|')
         ##2 A centered site is one that lacks perfect seed pairing and 3'-compensatory pairing but instead has 11-12 contiguous Watson-Crick pairs to miRNA positions 4-15
-        index4Flag = mirnaPosTag(mirnaSeq, 4)
-        index15Flag = mirnaPosTag(mirnaSeq, 15)
+        index4Flag = MirnaPosTag(mirnaSeq, 4)
+        index15Flag = MirnaPosTag(mirnaSeq, 15)
         centerMatchCount = alignRev[index4Flag:index15Flag + 1].count('|')
         if prime3CenterMatch == 4 or (centerMatchCount == 11 or centerMatchCount == 12):
             siteType = 'noncanonical'
@@ -116,7 +116,7 @@ def mirTargetSitesType(mirnaSeq, alignment, targetSeq):
             siteType = 'non-seed'
     return siteType
 
-def findBulge(alignment):
+def FindBulge(alignment):
     #alignment:3'->5', seed region, 2nd~7th
     alignRev = alignment[::-1].replace(':', '|')
     matchIter = re.finditer(r'\|+', alignRev)
@@ -138,7 +138,7 @@ def findBulge(alignment):
     bulgeRegion = [bulgeStart, bulgeEnd]
     return bulgeRegion
 
-def tagRegionByBulge(alignRev, regex, bulgeRegion):
+def TagRegionByBulge(alignRev, regex, bulgeRegion):
     regexIter = re.finditer(r'{0}'.format(regex), alignRev)
     regexIndexList = [[m.start(), m.end() - 1] for m in regexIter]
     bulgeStart = bulgeRegion[0]
@@ -170,7 +170,7 @@ def tagRegionByBulge(alignRev, regex, bulgeRegion):
     regexIndexList.extend(extraIndexList)
     return regexIndexList
 
-def regionClassifier(mirnaSeq, alignment, targetSeq):
+def RegionClassifier(mirnaSeq, alignment, targetSeq):
     mirnaSeqList = list(mirnaSeq[::-1])
     pairList = list(alignment[::-1])
     targetSeqList = list(targetSeq[::-1])
@@ -184,11 +184,11 @@ def regionClassifier(mirnaSeq, alignment, targetSeq):
                 pairList[i] = '-'
     alignRev = ''.join(pairList)
     ## classify and label the region
-    bulgeRegion = findBulge(alignment)
-    matchTagList = tagRegionByBulge(alignRev, '\|+', bulgeRegion)
-    wobbleTagList = tagRegionByBulge(alignRev, ':+', bulgeRegion)
-    mismatchTagList = tagRegionByBulge(alignRev, '\s+', bulgeRegion)
-    gapTagList = tagRegionByBulge(alignRev, '-+', bulgeRegion)
+    bulgeRegion = FindBulge(alignment)
+    matchTagList = TagRegionByBulge(alignRev, '\|+', bulgeRegion)
+    wobbleTagList = TagRegionByBulge(alignRev, ':+', bulgeRegion)
+    mismatchTagList = TagRegionByBulge(alignRev, '\s+', bulgeRegion)
+    gapTagList = TagRegionByBulge(alignRev, '-+', bulgeRegion)
     ## store the labeled region
     regionDict = {}
     regionDict['match'] = matchTagList
@@ -205,24 +205,24 @@ def CalculateTdmdScore(mirnaSeq, alignment, targetSeq):
     ## construct penalty dictionary
     watsonList = ['A', 'U', 'C', '-']
     crickList = ['T', 'A', 'G', '-']
-    watsonCrickDict = creatWatsonCrickDict(watsonList, crickList)
+    watsonCrickDict = CreatWatsonCrickDict(watsonList, crickList)
     
     wb1List = ['G']
     wb2List = ['U']
-    wobblePairDict = creatWatsonCrickDict(wb1List, wb2List)
+    wobblePairDict = CreatWatsonCrickDict(wb1List, wb2List)
 
     penaltyDict = {}
     penaltyDict['match'] = 2
     penaltyDict['wobble'] = 1
     penaltyDict['gap'] = -2
     penaltyDict['mismatch'] = -1
-    reAlignment = reconAlignment(mirnaSeq, alignment, targetSeq, watsonCrickDict, wobblePairDict)
-    siteType = mirTargetSitesType(mirnaSeq, reAlignment, targetSeq)
+    reAlignment = ReconAlignment(mirnaSeq, alignment, targetSeq, watsonCrickDict, wobblePairDict)
+    siteType = MirTargetSitesType(mirnaSeq, reAlignment, targetSeq)
     if (siteType == "non-seed"):
         startScore = -2 * len(targetSeq)
     else:
         startScore = 0
-    regionDict = regionClassifier(mirnaSeq, alignment, targetSeq)
+    regionDict = RegionClassifier(mirnaSeq, alignment, targetSeq)
     ## {'match': [[1, 7, 'front'], [12, 25, 'behind']], 'wobble': [], 'mismatch': [[0, 0, 'front'], [9, 10, 'in']], 'gap': [[8, 8, 'in'], [11, 11, 'in']]}
     ## calculate the penalty score
     score = 0
